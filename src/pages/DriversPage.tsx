@@ -10,7 +10,7 @@ export default function DriversPage() {
   const [showForm, setShowForm] = useState(false);
   const [showAdvance, setShowAdvance] = useState(false);
   const [editing, setEditing] = useState<Driver | null>(null);
-  const [form, setForm] = useState({ name: '', role: 'driver' as const, monthlySalary: 0 });
+  const [form, setForm] = useState<{ name: string; role: 'driver' | 'tanman'; monthlySalary: number }>({ name: '', role: 'driver', monthlySalary: 0 });
   const [advForm, setAdvForm] = useState({ personId: '', date: '', amount: 0, notes: '' });
   const [filter, setFilter] = useState<'all' | 'driver' | 'tanman'>('all');
 

@@ -8,7 +8,7 @@ export default function TrucksPage() {
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Truck | null>(null);
-  const [form, setForm] = useState({ registration: '', make: '', model: '', mileage: 0, status: 'active' as const });
+  const [form, setForm] = useState<{ registration: string; make: string; model: string; mileage: number; status: 'active' | 'inactive' }>({ registration: '', make: '', model: '', mileage: 0, status: 'active' });
   const [search, setSearch] = useState('');
 
   const reload = () => setTrucks(getTrucks());
