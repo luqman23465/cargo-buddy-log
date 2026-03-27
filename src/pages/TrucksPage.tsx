@@ -21,7 +21,7 @@ export default function TrucksPage() {
     } else {
       saveTruck(form);
     }
-    setForm({ registration: '', make: '', model: '', mileage: 0, status: 'active' });
+    setForm({ registration: '', make: '', model: '', mileage: 0, status: 'active' as 'active' | 'inactive' });
     setEditing(null);
     setShowForm(false);
     reload();
