@@ -32,7 +32,7 @@ export default function ExpensesPage() {
           <h1 className="page-header">Expenses & Payables</h1>
           <p className="text-muted-foreground text-sm mt-1">Company liabilities (We Owe Others)</p>
         </div>
-        <Button onClick={() => setShowForm(true)}><Plus className="w-4 h-4" /> Add Payable</Button>
+        <Button size="sm" onClick={() => setShowForm(true)}><Plus className="w-4 h-4" /> Add Payable</Button>
       </div>
 
       {showForm && (
@@ -41,7 +41,7 @@ export default function ExpensesPage() {
             <h2 className="text-sm font-medium">New Payable</h2>
             <button onClick={() => setShowForm(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <Input placeholder="Payee Name" value={form.payeeName} onChange={e => setForm({ ...form, payeeName: e.target.value })} required />
             <Input type="number" placeholder="Amount" value={form.amount || ''} onChange={e => setForm({ ...form, amount: Number(e.target.value) })} required />
             <Input type="date" value={form.dateTaken} onChange={e => setForm({ ...form, dateTaken: e.target.value })} required />
@@ -55,18 +55,18 @@ export default function ExpensesPage() {
         <h2 className="text-sm font-medium text-muted-foreground mb-3">Unpaid ({unpaid.length})</h2>
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Payee</th><th>Amount</th><th>Date Taken</th><th>Due Date</th><th className="text-right">Action</th></tr></thead>
+            <thead><tr><th>Payee</th><th>Amount</th><th>Date Taken</th><th className="hidden sm:table-cell">Due Date</th><th className="text-right">Action</th></tr></thead>
             <tbody>
               {unpaid.length === 0 ? (
                 <tr><td colSpan={5} className="text-center text-muted-foreground py-6">No unpaid liabilities</td></tr>
               ) : unpaid.map(p => (
                 <tr key={p.id}>
                   <td className="font-medium">{p.payeeName}</td>
-                  <td className="font-mono text-warning">${fmt(p.amount)}</td>
+                  <td className="font-mono text-warning">KSh {fmt(p.amount)}</td>
                   <td className="font-mono text-xs">{p.dateTaken}</td>
-                  <td className="font-mono text-xs">{p.dateDue}</td>
+                  <td className="font-mono text-xs hidden sm:table-cell">{p.dateDue}</td>
                   <td className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => markPaid(p.id)}><Check className="w-3.5 h-3.5" /> Mark Paid</Button>
+                    <Button variant="ghost" size="sm" onClick={() => markPaid(p.id)}><Check className="w-3.5 h-3.5" /> Paid</Button>
                   </td>
                 </tr>
               ))}
@@ -80,14 +80,14 @@ export default function ExpensesPage() {
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Paid ({paid.length})</h2>
           <div className="stat-card overflow-x-auto">
             <table className="data-table">
-              <thead><tr><th>Payee</th><th>Amount</th><th>Date Taken</th><th>Due Date</th><th>Status</th></tr></thead>
+              <thead><tr><th>Payee</th><th>Amount</th><th>Date Taken</th><th className="hidden sm:table-cell">Due Date</th><th>Status</th></tr></thead>
               <tbody>
                 {paid.map(p => (
                   <tr key={p.id} className="opacity-60">
                     <td>{p.payeeName}</td>
-                    <td className="font-mono">${fmt(p.amount)}</td>
+                    <td className="font-mono">KSh {fmt(p.amount)}</td>
                     <td className="font-mono text-xs">{p.dateTaken}</td>
-                    <td className="font-mono text-xs">{p.dateDue}</td>
+                    <td className="font-mono text-xs hidden sm:table-cell">{p.dateDue}</td>
                     <td><span className="badge-active">paid</span></td>
                   </tr>
                 ))}

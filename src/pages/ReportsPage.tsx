@@ -17,10 +17,10 @@ export default function ReportsPage() {
 
   const fmt = (n: number) => n.toLocaleString('en', { minimumFractionDigits: 2 });
   const tabs = [
-    { key: 'truck' as const, label: 'Truck Performance' },
-    { key: 'driver' as const, label: 'Driver Earnings' },
-    { key: 'client' as const, label: 'Client Balances' },
-    { key: 'fuel' as const, label: 'Fuel Consumption' },
+    { key: 'truck' as const, label: 'Trucks' },
+    { key: 'driver' as const, label: 'Drivers' },
+    { key: 'client' as const, label: 'Clients' },
+    { key: 'fuel' as const, label: 'Fuel' },
     { key: 'payables' as const, label: 'Payables' },
   ];
 
@@ -42,7 +42,7 @@ export default function ReportsPage() {
       {tab === 'truck' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Truck</th><th>Trips</th><th>Revenue</th><th>Fuel</th><th>Expenses</th><th>Profit</th><th>Mileage</th></tr></thead>
+            <thead><tr><th>Truck</th><th>Trips</th><th>Revenue</th><th className="hidden sm:table-cell">Fuel</th><th className="hidden sm:table-cell">Expenses</th><th>Profit</th><th className="hidden md:table-cell">Mileage</th></tr></thead>
             <tbody>
               {trucks.map(tk => {
                 const tTrips = trips.filter(t => t.truckId === tk.id);
@@ -55,11 +55,11 @@ export default function ReportsPage() {
                   <tr key={tk.id}>
                     <td className="font-mono font-medium">{tk.registration}</td>
                     <td className="font-mono">{tTrips.length}</td>
-                    <td className="font-mono">${fmt(rev)}</td>
-                    <td className="font-mono">${fmt(fuel)}</td>
-                    <td className="font-mono">${fmt(exp)}</td>
-                    <td className={`font-mono ${prof >= 0 ? 'text-success' : 'text-destructive'}`}>${fmt(prof)}</td>
-                    <td className="font-mono">{miles.toLocaleString()} km</td>
+                    <td className="font-mono">KSh {fmt(rev)}</td>
+                    <td className="font-mono hidden sm:table-cell">KSh {fmt(fuel)}</td>
+                    <td className="font-mono hidden sm:table-cell">KSh {fmt(exp)}</td>
+                    <td className={`font-mono ${prof >= 0 ? 'text-success' : 'text-destructive'}`}>KSh {fmt(prof)}</td>
+                    <td className="font-mono hidden md:table-cell">{miles.toLocaleString()} km</td>
                   </tr>
                 );
               })}
@@ -72,7 +72,7 @@ export default function ReportsPage() {
       {tab === 'driver' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Name</th><th>Role</th><th>Salary</th><th>Trip Pay</th><th>Advances</th><th>Net Payable</th></tr></thead>
+            <thead><tr><th>Name</th><th>Role</th><th>Salary</th><th>Trip Pay</th><th className="hidden sm:table-cell">Advances</th><th>Net</th></tr></thead>
             <tbody>
               {drivers.map(d => {
                 const tripPay = trips.filter(t => t.driverId === d.id || t.tanmanId === d.id).reduce((s, t) => s + t.tripPay, 0);
@@ -82,10 +82,10 @@ export default function ReportsPage() {
                   <tr key={d.id}>
                     <td className="font-medium">{d.name}</td>
                     <td><span className={d.role === 'driver' ? 'badge-active' : 'badge-warning'}>{d.role}</span></td>
-                    <td className="font-mono">${fmt(d.monthlySalary)}</td>
-                    <td className="font-mono">${fmt(tripPay)}</td>
-                    <td className="font-mono text-destructive">${fmt(adv)}</td>
-                    <td className="font-mono font-medium">${fmt(net)}</td>
+                    <td className="font-mono">KSh {fmt(d.monthlySalary)}</td>
+                    <td className="font-mono">KSh {fmt(tripPay)}</td>
+                    <td className="font-mono text-destructive hidden sm:table-cell">KSh {fmt(adv)}</td>
+                    <td className="font-mono font-medium">KSh {fmt(net)}</td>
                   </tr>
                 );
               })}
@@ -104,7 +104,7 @@ export default function ReportsPage() {
                 <tr key={c.id}>
                   <td className="font-medium">{c.name}</td>
                   <td>{c.contact || '—'}</td>
-                  <td className={`font-mono ${c.balance > 0 ? 'text-warning' : 'text-success'}`}>${fmt(c.balance)}</td>
+                  <td className={`font-mono ${c.balance > 0 ? 'text-warning' : 'text-success'}`}>KSh {fmt(c.balance)}</td>
                 </tr>
               ))}
               {clients.length === 0 && <tr><td colSpan={3} className="text-center text-muted-foreground py-8">No data</td></tr>}
@@ -116,7 +116,7 @@ export default function ReportsPage() {
       {tab === 'fuel' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Truck</th><th>Total Fuel Cost</th><th>Total Mileage</th><th>Cost/km</th></tr></thead>
+            <thead><tr><th>Truck</th><th>Fuel Cost</th><th>Mileage</th><th>Cost/km</th></tr></thead>
             <tbody>
               {trucks.map(tk => {
                 const tTrips = trips.filter(t => t.truckId === tk.id);
@@ -126,9 +126,9 @@ export default function ReportsPage() {
                 return (
                   <tr key={tk.id}>
                     <td className="font-mono font-medium">{tk.registration}</td>
-                    <td className="font-mono">${fmt(fuel)}</td>
+                    <td className="font-mono">KSh {fmt(fuel)}</td>
                     <td className="font-mono">{miles.toLocaleString()} km</td>
-                    <td className="font-mono">${cpk.toFixed(2)}/km</td>
+                    <td className="font-mono">KSh {cpk.toFixed(2)}/km</td>
                   </tr>
                 );
               })}
@@ -141,14 +141,14 @@ export default function ReportsPage() {
       {tab === 'payables' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Payee</th><th>Amount</th><th>Date Taken</th><th>Due Date</th><th>Status</th></tr></thead>
+            <thead><tr><th>Payee</th><th>Amount</th><th className="hidden sm:table-cell">Date Taken</th><th className="hidden sm:table-cell">Due Date</th><th>Status</th></tr></thead>
             <tbody>
               {payables.map(p => (
                 <tr key={p.id}>
                   <td className="font-medium">{p.payeeName}</td>
-                  <td className="font-mono">${fmt(p.amount)}</td>
-                  <td className="font-mono text-xs">{p.dateTaken}</td>
-                  <td className="font-mono text-xs">{p.dateDue}</td>
+                  <td className="font-mono">KSh {fmt(p.amount)}</td>
+                  <td className="font-mono text-xs hidden sm:table-cell">{p.dateTaken}</td>
+                  <td className="font-mono text-xs hidden sm:table-cell">{p.dateDue}</td>
                   <td><span className={p.status === 'paid' ? 'badge-active' : 'badge-warning'}>{p.status}</span></td>
                 </tr>
               ))}

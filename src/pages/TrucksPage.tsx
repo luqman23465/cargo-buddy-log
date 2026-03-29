@@ -49,7 +49,7 @@ export default function TrucksPage() {
           <h1 className="page-header">Trucks</h1>
           <p className="text-muted-foreground text-sm mt-1">{trucks.length} registered vehicles</p>
         </div>
-        <Button onClick={() => { setEditing(null); setForm({ registration: '', make: '', model: '', mileage: 0, status: 'active' }); setShowForm(true); }}>
+        <Button size="sm" onClick={() => { setEditing(null); setForm({ registration: '', make: '', model: '', mileage: 0, status: 'active' }); setShowForm(true); }}>
           <Plus className="w-4 h-4" /> Add Truck
         </Button>
       </div>
@@ -60,7 +60,7 @@ export default function TrucksPage() {
             <h2 className="text-sm font-medium">{editing ? 'Edit Truck' : 'New Truck'}</h2>
             <button onClick={() => setShowForm(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <Input placeholder="Registration No." value={form.registration} onChange={e => setForm({ ...form, registration: e.target.value })} required />
             <Input placeholder="Make" value={form.make} onChange={e => setForm({ ...form, make: e.target.value })} />
             <Input placeholder="Model" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} />
@@ -87,7 +87,7 @@ export default function TrucksPage() {
           <thead>
             <tr>
               <th>Registration</th>
-              <th>Make / Model</th>
+              <th className="hidden sm:table-cell">Make / Model</th>
               <th>Mileage</th>
               <th>Status</th>
               <th className="text-right">Actions</th>
@@ -99,7 +99,7 @@ export default function TrucksPage() {
             ) : filtered.map(t => (
               <tr key={t.id}>
                 <td className="font-mono font-medium">{t.registration}</td>
-                <td>{[t.make, t.model].filter(Boolean).join(' ') || '—'}</td>
+                <td className="hidden sm:table-cell">{[t.make, t.model].filter(Boolean).join(' ') || '—'}</td>
                 <td className="font-mono">{t.mileage.toLocaleString()} km</td>
                 <td><span className={t.status === 'active' ? 'badge-active' : 'badge-inactive'}>{t.status}</span></td>
                 <td className="text-right">
