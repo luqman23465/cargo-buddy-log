@@ -11,7 +11,7 @@ function StatCard({ icon: Icon, label, value, sub, color }: {
         <span className="text-muted-foreground text-sm">{label}</span>
         <Icon className="w-4 h-4 text-muted-foreground" />
       </div>
-      <div className={`text-2xl font-semibold font-mono ${color || ''}`}>{value}</div>
+      <div className={`text-xl md:text-2xl font-semibold font-mono ${color || ''}`}>{value}</div>
       {sub && <div className="text-xs text-muted-foreground mt-1">{sub}</div>}
     </div>
   );
@@ -52,11 +52,11 @@ export default function Dashboard() {
         <p className="text-muted-foreground text-sm mt-1">Fleet operations overview</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={DollarSign} label="Monthly Revenue" value={`$${fmt(monthlyRevenue)}`} sub={`${thisMonth.length} trips this month`} />
-        <StatCard icon={TrendingUp} label="Monthly Profit" value={`$${fmt(monthlyProfit)}`} color={monthlyProfit >= 0 ? "text-success" : "text-destructive"} />
-        <StatCard icon={Users} label="Client Balances" value={`$${fmt(totalOwed)}`} sub="Outstanding receivables" />
-        <StatCard icon={AlertCircle} label="Payables Due" value={`$${fmt(totalPayables)}`} sub="Unpaid liabilities" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <StatCard icon={DollarSign} label="Monthly Revenue" value={`KSh ${fmt(monthlyRevenue)}`} sub={`${thisMonth.length} trips this month`} />
+        <StatCard icon={TrendingUp} label="Monthly Profit" value={`KSh ${fmt(monthlyProfit)}`} color={monthlyProfit >= 0 ? "text-success" : "text-destructive"} />
+        <StatCard icon={Users} label="Client Balances" value={`KSh ${fmt(totalOwed)}`} sub="Outstanding receivables" />
+        <StatCard icon={AlertCircle} label="Payables Due" value={`KSh ${fmt(totalPayables)}`} sub="Unpaid liabilities" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -65,28 +65,30 @@ export default function Dashboard() {
           {recentTrips.length === 0 ? (
             <p className="text-muted-foreground text-sm py-8 text-center">No trips recorded yet. Add your first trip to get started.</p>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Destination</th>
-                  <th className="text-right">Revenue</th>
-                  <th className="text-right">Profit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentTrips.map(t => (
-                  <tr key={t.id}>
-                    <td className="font-mono text-xs">{t.outboundDate}</td>
-                    <td>{t.outbound.destination}</td>
-                    <td className="text-right font-mono">${fmt(calcTripRevenue(t))}</td>
-                    <td className={`text-right font-mono ${calcTripProfit(t) >= 0 ? 'text-success' : 'text-destructive'}`}>
-                      ${fmt(calcTripProfit(t))}
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Destination</th>
+                    <th className="text-right">Revenue</th>
+                    <th className="text-right">Profit</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentTrips.map(t => (
+                    <tr key={t.id}>
+                      <td className="font-mono text-xs">{t.outboundDate}</td>
+                      <td>{t.outbound.destination}</td>
+                      <td className="text-right font-mono">KSh {fmt(calcTripRevenue(t))}</td>
+                      <td className={`text-right font-mono ${calcTripProfit(t) >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        KSh {fmt(calcTripProfit(t))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 

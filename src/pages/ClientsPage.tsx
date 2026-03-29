@@ -37,16 +37,16 @@ export default function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="page-header">Clients</h1>
           <p className="text-muted-foreground text-sm mt-1">{clients.length} clients</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowPayment(true)}>
-            <CreditCard className="w-4 h-4" /> Record Payment
+          <Button variant="outline" size="sm" onClick={() => setShowPayment(true)}>
+            <CreditCard className="w-4 h-4" /> Payment
           </Button>
-          <Button onClick={() => { setEditing(null); setForm({ name: '', contact: '', email: '', balance: 0 }); setShowForm(true); }}>
+          <Button size="sm" onClick={() => { setEditing(null); setForm({ name: '', contact: '', email: '', balance: 0 }); setShowForm(true); }}>
             <Plus className="w-4 h-4" /> Add Client
           </Button>
         </div>
@@ -58,7 +58,7 @@ export default function ClientsPage() {
             <h2 className="text-sm font-medium">{editing ? 'Edit' : 'New'} Client</h2>
             <button onClick={() => setShowForm(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Input placeholder="Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
             <Input placeholder="Contact" value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} />
             <Input placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
@@ -73,7 +73,7 @@ export default function ClientsPage() {
             <h2 className="text-sm font-medium">Record Client Payment</h2>
             <button onClick={() => setShowPayment(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
           </div>
-          <form onSubmit={handlePaySubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <form onSubmit={handlePaySubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={payForm.clientId} onChange={e => setPayForm({ ...payForm, clientId: e.target.value })} required>
               <option value="">Select client</option>
               {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -91,7 +91,7 @@ export default function ClientsPage() {
       <div className="stat-card overflow-x-auto">
         <table className="data-table">
           <thead>
-            <tr><th>Name</th><th>Contact</th><th>Email</th><th className="text-right">Balance Owed</th><th className="text-right">Actions</th></tr>
+            <tr><th>Name</th><th>Contact</th><th className="hidden sm:table-cell">Email</th><th className="text-right">Balance Owed</th><th className="text-right">Actions</th></tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
@@ -100,8 +100,8 @@ export default function ClientsPage() {
               <tr key={c.id}>
                 <td className="font-medium">{c.name}</td>
                 <td>{c.contact || '—'}</td>
-                <td>{c.email || '—'}</td>
-                <td className={`text-right font-mono ${c.balance > 0 ? 'text-warning' : 'text-success'}`}>${fmt(c.balance)}</td>
+                <td className="hidden sm:table-cell">{c.email || '—'}</td>
+                <td className={`text-right font-mono ${c.balance > 0 ? 'text-warning' : 'text-success'}`}>KSh {fmt(c.balance)}</td>
                 <td className="text-right">
                   <button onClick={() => { setEditing(c); setForm({ name: c.name, contact: c.contact || '', email: c.email || '', balance: c.balance }); setShowForm(true); }} className="text-muted-foreground hover:text-foreground p-1"><Pencil className="w-3.5 h-3.5" /></button>
                   <button onClick={() => { if (confirm('Delete?')) { deleteClient(c.id); reload(); } }} className="text-muted-foreground hover:text-destructive p-1 ml-1"><Trash2 className="w-3.5 h-3.5" /></button>

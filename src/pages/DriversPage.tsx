@@ -37,16 +37,16 @@ export default function DriversPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="page-header">Drivers & Tanmen</h1>
           <p className="text-muted-foreground text-sm mt-1">{drivers.length} personnel</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowAdvance(true)}>
-            <Banknote className="w-4 h-4" /> Record Advance
+          <Button variant="outline" size="sm" onClick={() => setShowAdvance(true)}>
+            <Banknote className="w-4 h-4" /> Advance
           </Button>
-          <Button onClick={() => { setEditing(null); setForm({ name: '', role: 'driver', monthlySalary: 0 }); setShowForm(true); }}>
+          <Button size="sm" onClick={() => { setEditing(null); setForm({ name: '', role: 'driver', monthlySalary: 0 }); setShowForm(true); }}>
             <Plus className="w-4 h-4" /> Add Person
           </Button>
         </div>
@@ -58,7 +58,7 @@ export default function DriversPage() {
             <h2 className="text-sm font-medium">{editing ? 'Edit' : 'New'} Driver/Tanman</h2>
             <button onClick={() => setShowForm(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Input placeholder="Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
             <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.role} onChange={e => setForm({ ...form, role: e.target.value as 'driver' | 'tanman' })}>
               <option value="driver">Driver</option>
@@ -76,7 +76,7 @@ export default function DriversPage() {
             <h2 className="text-sm font-medium">Record Advance</h2>
             <button onClick={() => setShowAdvance(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
           </div>
-          <form onSubmit={handleAdvSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <form onSubmit={handleAdvSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={advForm.personId} onChange={e => setAdvForm({ ...advForm, personId: e.target.value })} required>
               <option value="">Select person</option>
               {drivers.map(d => <option key={d.id} value={d.id}>{d.name} ({d.role})</option>)}
@@ -100,7 +100,7 @@ export default function DriversPage() {
       <div className="stat-card overflow-x-auto">
         <table className="data-table">
           <thead>
-            <tr><th>Name</th><th>Role</th><th>Monthly Salary</th><th>Advances (Total)</th><th className="text-right">Actions</th></tr>
+            <tr><th>Name</th><th>Role</th><th>Salary</th><th>Advances</th><th className="text-right">Actions</th></tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
@@ -111,8 +111,8 @@ export default function DriversPage() {
                 <tr key={d.id}>
                   <td className="font-medium">{d.name}</td>
                   <td><span className={d.role === 'driver' ? 'badge-active' : 'badge-warning'}>{d.role}</span></td>
-                  <td className="font-mono">${fmt(d.monthlySalary)}</td>
-                  <td className="font-mono">${fmt(totalAdv)}</td>
+                  <td className="font-mono">KSh {fmt(d.monthlySalary)}</td>
+                  <td className="font-mono">KSh {fmt(totalAdv)}</td>
                   <td className="text-right">
                     <button onClick={() => { setEditing(d); setForm({ name: d.name, role: d.role, monthlySalary: d.monthlySalary }); setShowForm(true); }} className="text-muted-foreground hover:text-foreground p-1"><Pencil className="w-3.5 h-3.5" /></button>
                     <button onClick={() => { if (confirm('Delete?')) { deleteDriver(d.id); reload(); } }} className="text-muted-foreground hover:text-destructive p-1 ml-1"><Trash2 className="w-3.5 h-3.5" /></button>
