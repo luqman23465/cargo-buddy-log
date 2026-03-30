@@ -225,14 +225,14 @@ export const saveMaintenanceEntry = (m: Omit<MaintenanceEntry, 'id'>) => {
   return entry;
 };
 
-// Trip calculations
+// Trip calculations — force numeric coercion to prevent string concatenation
 export const calcTripRevenue = (t: Trip) =>
-  t.outbound.loadAmount + (t.returnLeg?.loadAmount || 0);
+  Number(t.outbound.loadAmount || 0) + Number(t.returnLeg?.loadAmount || 0);
 
 export const calcTripExpenses = (t: Trip) =>
-  t.outbound.fuelCost + (t.returnLeg?.fuelCost || 0) +
-  (t.outbound.sparePartsCost || 0) + (t.returnLeg?.sparePartsCost || 0) +
-  t.tripPay;
+  Number(t.outbound.fuelCost || 0) + Number(t.returnLeg?.fuelCost || 0) +
+  Number(t.outbound.sparePartsCost || 0) + Number(t.returnLeg?.sparePartsCost || 0) +
+  Number(t.tripPay || 0);
 
 export const calcTripProfit = (t: Trip) =>
   calcTripRevenue(t) - calcTripExpenses(t);
