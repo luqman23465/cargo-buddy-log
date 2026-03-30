@@ -8,6 +8,7 @@ import {
   getPayables,
   calcTripRevenue,
   calcTripExpenses,
+  calcTripProfit,
   Trip,
   Truck,
   Driver,
@@ -25,12 +26,33 @@ export default function ReportsPage() {
   const [advances, setAdvances] = useState<Advance[]>([]);
   const [payables, setPayables] = useState<Payable[]>([]);
 
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
   useEffect(() => {
     setTrips(getTrips()); setTrucks(getTrucks()); setDrivers(getDrivers());
     setClients(getClients()); setAdvances(getAdvances()); setPayables(getPayables());
   }, []);
 
   const fmt = (n: number) => n.toLocaleString('en', { minimumFractionDigits: 2 });
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
+
+  const filteredTrips = trips.filter(t => {
+    const d = new Date(t.outboundDate);
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+  });
+
+  const filteredAdvances = advances.filter(a => {
+    const d = new Date(a.date);
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+  });
+
   const tabs = [
     { key: 'truck' as const, label: 'Trucks' },
     { key: 'driver' as const, label: 'Drivers' },
@@ -41,9 +63,28 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="page-header">Reports</h1>
-        <p className="text-muted-foreground text-sm mt-1">Performance analytics and summaries</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="page-header">Reports</h1>
+          <p className="text-muted-foreground text-sm mt-1">Performance analytics and summaries</p>
+        </div>
+
+        <div className="flex gap-2">
+          <select
+            className="flex h-9 w-32 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          >
+            {months.map((m, i) => <option key={m} value={i}>{m}</option>)}
+          </select>
+          <select
+            className="flex h-9 w-24 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+          >
+            {years.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
@@ -60,11 +101,11 @@ export default function ReportsPage() {
             <thead><tr><th>Truck</th><th>Trips</th><th>Revenue</th><th className="hidden sm:table-cell">Fuel</th><th className="hidden sm:table-cell">Expenses</th><th>Profit</th><th className="hidden md:table-cell">Mileage (KSh)</th></tr></thead>
             <tbody>
               {trucks.map(tk => {
-                const tTrips = trips.filter(t => t.truckId === tk.id);
+                const tTrips = filteredTrips.filter(t => t.truckId === tk.id);
                 const rev = tTrips.reduce((s, t) => s + calcTripRevenue(t), 0);
                 const fuel = tTrips.reduce((s, t) => s + t.outbound.fuelCost + (t.returnLeg?.fuelCost || 0), 0);
                 const exp = tTrips.reduce((s, t) => s + calcTripExpenses(t), 0);
-                const prof = rev - exp;
+                const prof = tTrips.reduce((s, t) => s + calcTripProfit(t), 0);
                 const miles = tTrips.reduce((s, t) => s + t.outbound.mileage + (t.returnLeg?.mileage || 0), 0);
                 return (
                   <tr key={tk.id}>
@@ -87,11 +128,11 @@ export default function ReportsPage() {
       {tab === 'driver' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Name</th><th>Role</th><th>Salary</th><th>Trip Pay</th><th className="hidden sm:table-cell">Advances</th><th>Net</th></tr></thead>
+            <thead><tr><th>Name</th><th>Role</th><th>Salary</th><th>Trip Pay</th><th className="hidden sm:table-cell">Advances</th><th>Net Pay</th></tr></thead>
             <tbody>
               {drivers.map(d => {
-                const tripPay = trips.filter(t => t.driverId === d.id || t.tanmanId === d.id).reduce((s, t) => s + t.tripPay, 0);
-                const adv = advances.filter(a => a.personId === d.id).reduce((s: number, a: Advance) => s + a.amount, 0);
+                const tripPay = filteredTrips.filter(t => t.driverId === d.id || t.tanmanId === d.id).reduce((s, t) => s + t.tripPay, 0);
+                const adv = filteredAdvances.filter(a => a.personId === d.id).reduce((s: number, a: Advance) => s + a.amount, 0);
                 const net = d.monthlySalary + tripPay - adv;
                 return (
                   <tr key={d.id}>
@@ -134,7 +175,7 @@ export default function ReportsPage() {
             <thead><tr><th>Truck</th><th>Fuel Cost</th><th>Mileage (KSh)</th><th>Cost/KSh</th></tr></thead>
             <tbody>
               {trucks.map(tk => {
-                const tTrips = trips.filter(t => t.truckId === tk.id);
+                const tTrips = filteredTrips.filter(t => t.truckId === tk.id);
                 const fuel = tTrips.reduce((s, t) => s + t.outbound.fuelCost + (t.returnLeg?.fuelCost || 0), 0);
                 const miles = tTrips.reduce((s, t) => s + t.outbound.mileage + (t.returnLeg?.mileage || 0), 0);
                 const cpk = miles > 0 ? fuel / miles : 0;
