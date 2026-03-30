@@ -51,7 +51,7 @@ export default function MaintenancePage() {
             </select>
             <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} required />
             <Input placeholder="Service Type" value={form.serviceType} onChange={e => setForm({ ...form, serviceType: e.target.value })} required />
-            <Input type="number" placeholder="Mileage at service" value={form.mileage || ''} onChange={e => setForm({ ...form, mileage: Number(e.target.value) })} />
+            <Input type="number" placeholder="Mileage (KSh) at service" value={form.mileage || ''} onChange={e => setForm({ ...form, mileage: Number(e.target.value) })} />
             <Input type="number" placeholder="Cost (KSh)" value={form.cost || ''} onChange={e => setForm({ ...form, cost: Number(e.target.value) })} />
             <Input placeholder="Notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
             <Button type="submit" className="sm:col-start-2 md:col-start-3">Save</Button>
@@ -66,7 +66,7 @@ export default function MaintenancePage() {
 
       <div className="stat-card overflow-x-auto">
         <table className="data-table">
-          <thead><tr><th>Truck</th><th>Date</th><th>Service</th><th className="hidden sm:table-cell">Mileage</th><th>Cost</th><th className="hidden sm:table-cell">Notes</th></tr></thead>
+          <thead><tr><th>Truck</th><th>Date</th><th>Service</th><th className="hidden sm:table-cell">Mileage (KSh)</th><th>Cost</th><th className="hidden sm:table-cell">Notes</th></tr></thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr><td colSpan={6} className="text-center text-muted-foreground py-8">No entries found</td></tr>
@@ -75,7 +75,7 @@ export default function MaintenancePage() {
                 <td className="font-mono">{getReg(e.truckId)}</td>
                 <td className="font-mono text-xs">{e.date}</td>
                 <td>{e.serviceType}</td>
-                <td className="font-mono hidden sm:table-cell">{e.mileage.toLocaleString()} km</td>
+                <td className="font-mono hidden sm:table-cell">KSh {e.mileage.toLocaleString()}</td>
                 <td className="font-mono">{e.cost ? `KSh ${fmt(e.cost)}` : '—'}</td>
                 <td className="text-muted-foreground text-xs hidden sm:table-cell">{e.notes || '—'}</td>
               </tr>

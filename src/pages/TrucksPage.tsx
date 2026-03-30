@@ -64,7 +64,7 @@ export default function TrucksPage() {
             <Input placeholder="Registration No." value={form.registration} onChange={e => setForm({ ...form, registration: e.target.value })} required />
             <Input placeholder="Make" value={form.make} onChange={e => setForm({ ...form, make: e.target.value })} />
             <Input placeholder="Model" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} />
-            <Input type="number" placeholder="Mileage (km)" value={form.mileage || ''} onChange={e => setForm({ ...form, mileage: Number(e.target.value) })} />
+            <Input type="number" placeholder="Mileage (KSh)" value={form.mileage || ''} onChange={e => setForm({ ...form, mileage: Number(e.target.value) })} />
             <div className="flex gap-2">
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -100,7 +100,7 @@ export default function TrucksPage() {
               <tr key={t.id}>
                 <td className="font-mono font-medium">{t.registration}</td>
                 <td className="hidden sm:table-cell">{[t.make, t.model].filter(Boolean).join(' ') || '—'}</td>
-                <td className="font-mono">{t.mileage.toLocaleString()} km</td>
+                <td className="font-mono">KSh {t.mileage.toLocaleString()}</td>
                 <td><span className={t.status === 'active' ? 'badge-active' : 'badge-inactive'}>{t.status}</span></td>
                 <td className="text-right">
                   <button onClick={() => handleEdit(t)} className="text-muted-foreground hover:text-foreground p-1"><Pencil className="w-3.5 h-3.5" /></button>

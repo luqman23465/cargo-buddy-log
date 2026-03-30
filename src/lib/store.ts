@@ -232,7 +232,8 @@ export const calcTripRevenue = (t: Trip) =>
 export const calcTripExpenses = (t: Trip) =>
   Number(t.outbound.fuelCost || 0) + Number(t.returnLeg?.fuelCost || 0) +
   Number(t.outbound.sparePartsCost || 0) + Number(t.returnLeg?.sparePartsCost || 0) +
-  Number(t.tripPay || 0);
+  Number(t.tripPay || 0) +
+  Number(t.outbound.mileage || 0) + Number(t.returnLeg?.mileage || 0);
 
 export const calcTripProfit = (t: Trip) =>
   calcTripRevenue(t) - calcTripExpenses(t);

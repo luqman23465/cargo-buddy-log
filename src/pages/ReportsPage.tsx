@@ -57,7 +57,7 @@ export default function ReportsPage() {
       {tab === 'truck' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Truck</th><th>Trips</th><th>Revenue</th><th className="hidden sm:table-cell">Fuel</th><th className="hidden sm:table-cell">Expenses</th><th>Profit</th><th className="hidden md:table-cell">Mileage</th></tr></thead>
+            <thead><tr><th>Truck</th><th>Trips</th><th>Revenue</th><th className="hidden sm:table-cell">Fuel</th><th className="hidden sm:table-cell">Expenses</th><th>Profit</th><th className="hidden md:table-cell">Mileage (KSh)</th></tr></thead>
             <tbody>
               {trucks.map(tk => {
                 const tTrips = trips.filter(t => t.truckId === tk.id);
@@ -74,7 +74,7 @@ export default function ReportsPage() {
                     <td className="font-mono hidden sm:table-cell">KSh {fmt(fuel)}</td>
                     <td className="font-mono hidden sm:table-cell">KSh {fmt(exp)}</td>
                     <td className={`font-mono ${prof >= 0 ? 'text-success' : 'text-destructive'}`}>KSh {fmt(prof)}</td>
-                    <td className="font-mono hidden md:table-cell">{miles.toLocaleString()} km</td>
+                    <td className="font-mono hidden md:table-cell">KSh {fmt(miles)}</td>
                   </tr>
                 );
               })}
@@ -131,7 +131,7 @@ export default function ReportsPage() {
       {tab === 'fuel' && (
         <div className="stat-card overflow-x-auto">
           <table className="data-table">
-            <thead><tr><th>Truck</th><th>Fuel Cost</th><th>Mileage</th><th>Cost/km</th></tr></thead>
+            <thead><tr><th>Truck</th><th>Fuel Cost</th><th>Mileage (KSh)</th><th>Cost/KSh</th></tr></thead>
             <tbody>
               {trucks.map(tk => {
                 const tTrips = trips.filter(t => t.truckId === tk.id);
@@ -142,8 +142,8 @@ export default function ReportsPage() {
                   <tr key={tk.id}>
                     <td className="font-mono font-medium">{tk.registration}</td>
                     <td className="font-mono">KSh {fmt(fuel)}</td>
-                    <td className="font-mono">{miles.toLocaleString()} km</td>
-                    <td className="font-mono">KSh {cpk.toFixed(2)}/km</td>
+                    <td className="font-mono">KSh {fmt(miles)}</td>
+                    <td className="font-mono">KSh {cpk.toFixed(2)}/KSh</td>
                   </tr>
                 );
               })}

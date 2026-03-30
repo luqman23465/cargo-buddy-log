@@ -29,7 +29,7 @@ function LegForm({ leg, onChange, label, clients }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Input type="number" placeholder="Tonnes" value={leg.tonnes || ''} onChange={e => up('tonnes', Number(e.target.value))} />
         <Input placeholder="Container No." value={leg.containerNumber} onChange={e => up('containerNumber', e.target.value)} />
-        <Input type="number" placeholder="Mileage (km)" value={leg.mileage || ''} onChange={e => up('mileage', Number(e.target.value))} />
+        <Input type="number" placeholder="Mileage (KSh)" value={leg.mileage || ''} onChange={e => up('mileage', Number(e.target.value))} />
         <Input type="number" placeholder="Fuel Cost (KSh)" value={leg.fuelCost || ''} onChange={e => up('fuelCost', Number(e.target.value))} />
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -159,7 +159,7 @@ export default function TripsPage() {
                 <div><span className="text-muted-foreground text-xs block">Total Fuel</span><span className="font-mono">KSh {fmt(t.outbound.fuelCost + (t.returnLeg?.fuelCost || 0))}</span></div>
                 <div><span className="text-muted-foreground text-xs block">Trip Pay</span><span className="font-mono">KSh {fmt(t.tripPay)}</span></div>
                 <div><span className="text-muted-foreground text-xs block">Total Expenses</span><span className="font-mono">KSh {fmt(calcTripExpenses(t))}</span></div>
-                <div><span className="text-muted-foreground text-xs block">Total Mileage</span><span className="font-mono">{(t.outbound.mileage + (t.returnLeg?.mileage || 0)).toLocaleString()} km</span></div>
+                <div><span className="text-muted-foreground text-xs block">Total Mileage Cost</span><span className="font-mono">KSh {fmt(t.outbound.mileage + (t.returnLeg?.mileage || 0))}</span></div>
                 {t.outbound.spareParts && <div className="col-span-2"><span className="text-muted-foreground text-xs block">Outbound Parts</span>{t.outbound.spareParts}</div>}
                 {t.returnLeg?.spareParts && <div className="col-span-2"><span className="text-muted-foreground text-xs block">Return Parts</span>{t.returnLeg.spareParts}</div>}
               </div>
