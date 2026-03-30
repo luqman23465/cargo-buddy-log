@@ -1,14 +1,29 @@
 import { useEffect, useState } from "react";
-import { getTrips, getTrucks, getDrivers, getClients, getAdvances, getPayables, getMaintenanceEntries, calcTripRevenue, calcTripExpenses, calcTripProfit, Trip } from "@/lib/store";
+import {
+  getTrips,
+  getTrucks,
+  getDrivers,
+  getClients,
+  getAdvances,
+  getPayables,
+  calcTripRevenue,
+  calcTripExpenses,
+  Trip,
+  Truck,
+  Driver,
+  Client,
+  Advance,
+  Payable
+} from "@/lib/store";
 
 export default function ReportsPage() {
   const [tab, setTab] = useState<'truck' | 'driver' | 'client' | 'fuel' | 'payables'>('truck');
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [trucks, setTrucks] = useState<any[]>([]);
-  const [drivers, setDrivers] = useState<any[]>([]);
-  const [clients, setClients] = useState<any[]>([]);
-  const [advances, setAdvances] = useState<any[]>([]);
-  const [payables, setPayables] = useState<any[]>([]);
+  const [trucks, setTrucks] = useState<Truck[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [advances, setAdvances] = useState<Advance[]>([]);
+  const [payables, setPayables] = useState<Payable[]>([]);
 
   useEffect(() => {
     setTrips(getTrips()); setTrucks(getTrucks()); setDrivers(getDrivers());
@@ -76,7 +91,7 @@ export default function ReportsPage() {
             <tbody>
               {drivers.map(d => {
                 const tripPay = trips.filter(t => t.driverId === d.id || t.tanmanId === d.id).reduce((s, t) => s + t.tripPay, 0);
-                const adv = advances.filter(a => a.personId === d.id).reduce((s: number, a: any) => s + a.amount, 0);
+                const adv = advances.filter(a => a.personId === d.id).reduce((s: number, a: Advance) => s + a.amount, 0);
                 const net = d.monthlySalary + tripPay - adv;
                 return (
                   <tr key={d.id}>
