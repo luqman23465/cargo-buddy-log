@@ -1,20 +1,50 @@
 import { useEffect, useState } from "react";
-import { getTrips, saveTrip, getTrucks, getDrivers, getClients, Trip, TripLeg, calcTripRevenue, calcTripExpenses, calcTripProfit } from "@/lib/store";
+import { getTrips, saveTrip, getTrucks, getDrivers, getClients, Trip, TripLeg, FuelStop, calcTripRevenue, calcTripExpenses, calcTripProfit } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, X, ChevronDown, ChevronUp, Fuel } from "lucide-react";
+
+const emptyFuelStop: FuelStop = { location: '', cost: 0, pricePerLitre: 0, litres: 0 };
 
 const emptyLeg: TripLeg = {
   destination: '', clientId: '', loadAmount: 0, tonnes: 0, containerNumber: '',
   mileage: 0, fuelCost: 0, fuelLocation: '', fuelPricePerLitre: 0, litresPurchased: 0,
+  fuelStops: [],
   spareParts: '', sparePartsCost: 0,
 };
+
+function FuelStopForm({ stop, onChange, onRemove, index }: {
+  stop: FuelStop; onChange: (s: FuelStop) => void; onRemove: () => void; index: number;
+}) {
+  const up = (k: keyof FuelStop, v: string | number) => onChange({ ...stop, [k]: v });
+  return (
+    <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border border-border">
+      <Fuel className="w-4 h-4 text-muted-foreground shrink-0" />
+      <span className="text-xs text-muted-foreground shrink-0">Stop {index + 1}</span>
+      <Input placeholder="Location" value={stop.location} onChange={e => up('location', e.target.value)} className="h-8 text-xs" />
+      <Input type="number" placeholder="Cost (KSh)" value={stop.cost || ''} onChange={e => up('cost', Number(e.target.value))} className="h-8 text-xs w-28" />
+      <Input type="number" placeholder="KSh/L" value={stop.pricePerLitre || ''} onChange={e => up('pricePerLitre', Number(e.target.value))} className="h-8 text-xs w-24" />
+      <Input type="number" placeholder="Litres" value={stop.litres || ''} onChange={e => up('litres', Number(e.target.value))} className="h-8 text-xs w-24" />
+      <button type="button" onClick={onRemove}><X className="w-3 h-3 text-muted-foreground" /></button>
+    </div>
+  );
+}
 
 function LegForm({ leg, onChange, label, clients }: {
   leg: TripLeg; onChange: (l: TripLeg) => void; label: string;
   clients: { id: string; name: string }[];
 }) {
   const up = (k: keyof TripLeg, v: string | number) => onChange({ ...leg, [k]: v });
+  const stops = leg.fuelStops || [];
+
+  const addStop = () => onChange({ ...leg, fuelStops: [...stops, { ...emptyFuelStop }] });
+  const updateStop = (i: number, s: FuelStop) => {
+    const updated = [...stops];
+    updated[i] = s;
+    onChange({ ...leg, fuelStops: updated });
+  };
+  const removeStop = (i: number) => onChange({ ...leg, fuelStops: stops.filter((_, idx) => idx !== i) });
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-primary">{label}</h3>
@@ -30,15 +60,25 @@ function LegForm({ leg, onChange, label, clients }: {
         <Input type="number" placeholder="Tonnes" value={leg.tonnes || ''} onChange={e => up('tonnes', Number(e.target.value))} />
         <Input placeholder="Container No." value={leg.containerNumber} onChange={e => up('containerNumber', e.target.value)} />
         <Input type="number" placeholder="Mileage (km)" value={leg.mileage || ''} onChange={e => up('mileage', Number(e.target.value))} />
-        <Input type="number" placeholder="Fuel Cost (KSh)" value={leg.fuelCost || ''} onChange={e => up('fuelCost', Number(e.target.value))} />
+        <Input type="number" placeholder="Initial Fuel Cost (KSh)" value={leg.fuelCost || ''} onChange={e => up('fuelCost', Number(e.target.value))} />
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Input placeholder="Fuel Location" value={leg.fuelLocation} onChange={e => up('fuelLocation', e.target.value)} />
+        <Input placeholder="Initial Fuel Location" value={leg.fuelLocation} onChange={e => up('fuelLocation', e.target.value)} />
         <Input type="number" placeholder="Price/Litre" value={leg.fuelPricePerLitre || ''} onChange={e => up('fuelPricePerLitre', Number(e.target.value))} />
         <Input type="number" placeholder="Litres" value={leg.litresPurchased || ''} onChange={e => up('litresPurchased', Number(e.target.value))} />
         <Input type="number" placeholder="Parts Cost (KSh)" value={leg.sparePartsCost || ''} onChange={e => up('sparePartsCost', Number(e.target.value))} />
       </div>
       <Input placeholder="Spare parts / tyres changed (description)" value={leg.spareParts} onChange={e => up('spareParts', e.target.value)} />
+
+      {/* Additional fuel stops */}
+      <div className="space-y-2">
+        {stops.map((s, i) => (
+          <FuelStopForm key={i} stop={s} index={i} onChange={fs => updateStop(i, fs)} onRemove={() => removeStop(i)} />
+        ))}
+        <Button type="button" variant="outline" size="sm" onClick={addStop} className="gap-1">
+          <Fuel className="w-3 h-3" /> Add Fuel Stop
+        </Button>
+      </div>
     </div>
   );
 }
@@ -53,7 +93,9 @@ export default function TripsPage() {
 
   const [form, setForm] = useState({
     truckId: '', driverId: '', tanmanId: '', outboundDate: '', returnDate: '',
-    outbound: { ...emptyLeg }, returnLeg: { ...emptyLeg }, tripPay: 0,
+    outbound: { ...emptyLeg, fuelStops: [] as FuelStop[] },
+    returnLeg: { ...emptyLeg, fuelStops: [] as FuelStop[] },
+    tripPay: 0,
   });
 
   const reload = () => {
@@ -74,13 +116,26 @@ export default function TripsPage() {
       returnLeg: hasReturn ? form.returnLeg : undefined,
       tripPay: form.tripPay,
     });
-    setForm({ truckId: '', driverId: '', tanmanId: '', outboundDate: '', returnDate: '', outbound: { ...emptyLeg }, returnLeg: { ...emptyLeg }, tripPay: 0 });
+    setForm({
+      truckId: '', driverId: '', tanmanId: '', outboundDate: '', returnDate: '',
+      outbound: { ...emptyLeg, fuelStops: [] },
+      returnLeg: { ...emptyLeg, fuelStops: [] },
+      tripPay: 0,
+    });
     setShowForm(false); reload();
   };
 
   const fmt = (n: number) => n.toLocaleString('en', { minimumFractionDigits: 2 });
   const getTruckReg = (id: string) => trucks.find(t => t.id === id)?.registration || '—';
   const getDriverName = (id: string) => drivers.find(d => d.id === id)?.name || '—';
+
+  const calcTotalFuel = (t: Trip) => {
+    const legFuel = (leg?: TripLeg) => {
+      if (!leg) return 0;
+      return Number(leg.fuelCost || 0) + (leg.fuelStops || []).reduce((s, fs) => s + Number(fs.cost || 0), 0);
+    };
+    return legFuel(t.outbound) + legFuel(t.returnLeg);
+  };
 
   return (
     <div className="space-y-6">
@@ -153,15 +208,48 @@ export default function TripsPage() {
               </div>
             </button>
             {expanded === t.id && (
-              <div className="mt-4 pt-4 border-t border-border grid grid-cols-2 md:grid-cols-4 gap-4 text-sm animate-fade-in">
-                <div><span className="text-muted-foreground text-xs block">Driver</span>{getDriverName(t.driverId)}</div>
-                <div><span className="text-muted-foreground text-xs block">Tanman</span>{getDriverName(t.tanmanId)}</div>
-                <div><span className="text-muted-foreground text-xs block">Total Fuel</span><span className="font-mono">KSh {fmt(t.outbound.fuelCost + (t.returnLeg?.fuelCost || 0))}</span></div>
-                <div><span className="text-muted-foreground text-xs block">Trip Pay</span><span className="font-mono">KSh {fmt(t.tripPay)}</span></div>
-                <div><span className="text-muted-foreground text-xs block">Total Expenses</span><span className="font-mono">KSh {fmt(calcTripExpenses(t))}</span></div>
-                <div><span className="text-muted-foreground text-xs block">Total Mileage</span><span className="font-mono">{(t.outbound.mileage + (t.returnLeg?.mileage || 0)).toLocaleString()} km</span></div>
-                {t.outbound.spareParts && <div className="col-span-2"><span className="text-muted-foreground text-xs block">Outbound Parts</span>{t.outbound.spareParts}</div>}
-                {t.returnLeg?.spareParts && <div className="col-span-2"><span className="text-muted-foreground text-xs block">Return Parts</span>{t.returnLeg.spareParts}</div>}
+              <div className="mt-4 pt-4 border-t border-border space-y-4 animate-fade-in">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div><span className="text-muted-foreground text-xs block">Driver</span>{getDriverName(t.driverId)}</div>
+                  <div><span className="text-muted-foreground text-xs block">Tanman</span>{getDriverName(t.tanmanId)}</div>
+                  <div><span className="text-muted-foreground text-xs block">Total Fuel</span><span className="font-mono">KSh {fmt(calcTotalFuel(t))}</span></div>
+                  <div><span className="text-muted-foreground text-xs block">Trip Pay</span><span className="font-mono">KSh {fmt(t.tripPay)}</span></div>
+                  <div><span className="text-muted-foreground text-xs block">Total Expenses</span><span className="font-mono">KSh {fmt(calcTripExpenses(t))}</span></div>
+                  <div><span className="text-muted-foreground text-xs block">Total Mileage</span><span className="font-mono">{(t.outbound.mileage + (t.returnLeg?.mileage || 0)).toLocaleString()} km</span></div>
+                  {t.outbound.spareParts && <div className="col-span-2"><span className="text-muted-foreground text-xs block">Outbound Parts</span>{t.outbound.spareParts}</div>}
+                  {t.returnLeg?.spareParts && <div className="col-span-2"><span className="text-muted-foreground text-xs block">Return Parts</span>{t.returnLeg.spareParts}</div>}
+                </div>
+                {/* Show fuel stops */}
+                {(t.outbound.fuelStops?.length || 0) > 0 && (
+                  <div>
+                    <span className="text-muted-foreground text-xs font-medium block mb-1">Outbound Fuel Stops</span>
+                    <div className="space-y-1">
+                      {t.outbound.fuelStops!.map((fs, i) => (
+                        <div key={i} className="flex items-center gap-3 text-xs bg-muted/50 rounded px-2 py-1">
+                          <Fuel className="w-3 h-3 text-muted-foreground" />
+                          <span>{fs.location || 'Unknown'}</span>
+                          <span className="font-mono">KSh {fmt(fs.cost)}</span>
+                          <span className="text-muted-foreground">{fs.litres}L @ KSh {fmt(fs.pricePerLitre)}/L</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(t.returnLeg?.fuelStops?.length || 0) > 0 && (
+                  <div>
+                    <span className="text-muted-foreground text-xs font-medium block mb-1">Return Fuel Stops</span>
+                    <div className="space-y-1">
+                      {t.returnLeg!.fuelStops!.map((fs, i) => (
+                        <div key={i} className="flex items-center gap-3 text-xs bg-muted/50 rounded px-2 py-1">
+                          <Fuel className="w-3 h-3 text-muted-foreground" />
+                          <span>{fs.location || 'Unknown'}</span>
+                          <span className="font-mono">KSh {fmt(fs.cost)}</span>
+                          <span className="text-muted-foreground">{fs.litres}L @ KSh {fmt(fs.pricePerLitre)}/L</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
