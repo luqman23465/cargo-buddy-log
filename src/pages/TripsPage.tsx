@@ -173,7 +173,7 @@ export default function TripsPage() {
               <Input type="date" placeholder="Return date" value={form.returnDate} onChange={e => setForm({ ...form, returnDate: e.target.value })} />
             </div>
 
-            <LegForm leg={form.outbound} onChange={outbound => setForm({ ...form, outbound })} label="Outbound Leg" clients={clients} />
+            <LegForm leg={form.outbound} onChange={outbound => setForm({ ...form, outbound: { ...outbound, fuelStops: outbound.fuelStops || [] } })} label="Outbound Leg" clients={clients} />
 
             <div className="border-t border-border pt-4">
               <LegForm leg={form.returnLeg} onChange={returnLeg => setForm({ ...form, returnLeg })} label="Return Leg (optional)" clients={clients} />
