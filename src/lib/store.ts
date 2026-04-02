@@ -32,6 +32,13 @@ export interface Client {
   balance: number;
 }
 
+export interface FuelStop {
+  location: string;
+  cost: number;
+  pricePerLitre: number;
+  litres: number;
+}
+
 export interface TripLeg {
   destination: string;
   clientId: string;
@@ -43,6 +50,7 @@ export interface TripLeg {
   fuelLocation?: string;
   fuelPricePerLitre?: number;
   litresPurchased?: number;
+  fuelStops?: FuelStop[];
   spareParts?: string;
   sparePartsCost?: number;
 }
