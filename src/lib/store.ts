@@ -32,6 +32,13 @@ export interface Client {
   balance: number;
 }
 
+export interface FuelStop {
+  location: string;
+  cost: number;
+  pricePerLitre: number;
+  litres: number;
+}
+
 export interface TripLeg {
   destination: string;
   clientId: string;
@@ -43,6 +50,7 @@ export interface TripLeg {
   fuelLocation?: string;
   fuelPricePerLitre?: number;
   litresPurchased?: number;
+  fuelStops?: FuelStop[];
   spareParts?: string;
   sparePartsCost?: number;
 }
@@ -229,8 +237,12 @@ export const saveMaintenanceEntry = (m: Omit<MaintenanceEntry, 'id'>) => {
 export const calcTripRevenue = (t: Trip) =>
   Number(t.outbound.loadAmount || 0) + Number(t.returnLeg?.loadAmount || 0);
 
+const calcFuelStopsTotal = (stops?: FuelStop[]) =>
+  (stops || []).reduce((sum, s) => sum + Number(s.cost || 0), 0);
+
 export const calcTripExpenses = (t: Trip) =>
   Number(t.outbound.fuelCost || 0) + Number(t.returnLeg?.fuelCost || 0) +
+  calcFuelStopsTotal(t.outbound.fuelStops) + calcFuelStopsTotal(t.returnLeg?.fuelStops) +
   Number(t.outbound.sparePartsCost || 0) + Number(t.returnLeg?.sparePartsCost || 0) +
   Number(t.tripPay || 0);
 
