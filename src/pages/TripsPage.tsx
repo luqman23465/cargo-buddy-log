@@ -176,7 +176,7 @@ export default function TripsPage() {
             <LegForm leg={form.outbound} onChange={outbound => setForm({ ...form, outbound: { ...outbound, fuelStops: outbound.fuelStops || [] } })} label="Outbound Leg" clients={clients} />
 
             <div className="border-t border-border pt-4">
-              <LegForm leg={form.returnLeg} onChange={returnLeg => setForm({ ...form, returnLeg })} label="Return Leg (optional)" clients={clients} />
+              <LegForm leg={form.returnLeg} onChange={returnLeg => setForm({ ...form, returnLeg: { ...returnLeg, fuelStops: returnLeg.fuelStops || [] } })} label="Return Leg (optional)" clients={clients} />
             </div>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-t border-border pt-4">
